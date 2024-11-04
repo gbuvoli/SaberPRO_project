@@ -1,0 +1,45 @@
+project:
+  type: book
+book:
+  title: "Modelo predictivo para la identificación temprana de estudiantes con riesgo de bajo rendimiento en las pruebas SABER PRO"
+  author: "Gina Buvoli"
+  date: "24/8/2024"
+
+  chapters:
+    
+    - index.qmd
+    - part: "Introducción"
+      chapters: 
+        - 1_problem.md
+        - 2_justification.md
+        - 3_objetives.md
+        - 4_state_art.md
+    - part: "Metodología"
+      chapters:
+        - 5_methodology.md
+        - 5_1_load_data.ipynb
+        - 5_2_cleaning.ipynb
+        
+    - part: "Resultados"
+      chapters: 
+        - 6_results.md
+    - 7_schedule.md
+    - 8_references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+    include-in-header: 
+      text: |
+        \usepackage{makeidx}
+        \makeindex[intoc=true, columns=3, columnseprule=true, options=-s latex/indexstyles.ist]
+    include-after-body: 
+      text: |
+        \printindex
+
+
+

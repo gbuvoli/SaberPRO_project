@@ -1,0 +1,8 @@
+---
+bibliography: references.bib
+---
+
+# Referencias
+
+::: {#refs}
+:::

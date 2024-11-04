@@ -1,0 +1,11 @@
+{
+  "hash": "65491441776a34ee6b914ac6fdb66a05",
+  "result": {
+    "markdown": "# Resumen {.unnumbered}\n\nThis is a Quarto book.\n\nTo learn more about Quarto books visit <https://quarto.org/docs/books>.\n\n\n\n```{tableofcontents}\n```\n\n",
+    "supporting": [
+      "index_files\\figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

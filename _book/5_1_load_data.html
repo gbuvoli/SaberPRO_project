@@ -1,0 +1,3205 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Modelo predictivo para la identificación temprana de estudiantes con riesgo de bajo rendimiento en las pruebas SABER PRO - 6&nbsp; Comprensión de los Datos / Data Understanding</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./5_2_cleaning.html" rel="next">
+<link href="./5_methodology.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./5_methodology.html">Metodología</a></li><li class="breadcrumb-item"><a href="./5_1_load_data.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Comprensión de los Datos / Data Understanding</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Modelo predictivo para la identificación temprana de estudiantes con riesgo de bajo rendimiento en las pruebas SABER PRO</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Resumen</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Introducción</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./1_problem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Contextualización del Problema</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./2_justification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Justificación</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./3_objetives.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Objetivos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./4_state_art.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estado del Arte</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Metodología</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./5_methodology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Metodología CRISP DM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./5_1_load_data.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Comprensión de los Datos / Data Understanding</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./5_2_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Data Cleaning and Wrangling</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Resultados</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./6_results.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Resultados Esperados</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./7_schedule.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Cronograma</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./8_references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Referencias</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#lectura-de-datos" id="toc-lectura-de-datos" class="nav-link active" data-scroll-target="#lectura-de-datos"><span class="header-section-number">6.1</span> Lectura de datos</a></li>
+  <li><a href="#descripción-y-exploración-de-variables" id="toc-descripción-y-exploración-de-variables" class="nav-link" data-scroll-target="#descripción-y-exploración-de-variables"><span class="header-section-number">6.2</span> Descripción y exploración de Variables</a>
+  <ul class="collapse">
+  <li><a href="#sam-muestra-de-estudiantes-uninorte" id="toc-sam-muestra-de-estudiantes-uninorte" class="nav-link" data-scroll-target="#sam-muestra-de-estudiantes-uninorte"><span class="header-section-number">6.2.1</span> <code>sam</code> muestra de estudiantes Uninorte</a></li>
+  <li><a href="#resumen-y-next-steps" id="toc-resumen-y-next-steps" class="nav-link" data-scroll-target="#resumen-y-next-steps"><span class="header-section-number">6.2.2</span> Resumen y Next Steps</a></li>
+  </ul></li>
+  <li><a href="#descripción-de-variables-de-dataset-pob" id="toc-descripción-de-variables-de-dataset-pob" class="nav-link" data-scroll-target="#descripción-de-variables-de-dataset-pob"><span class="header-section-number">7</span> Descripción de variables de dataset Pob</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Comprensión de los Datos / Data Understanding</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2024-08-22T22:55:09.211507Z&quot;,&quot;start_time&quot;:&quot;2024-08-22T22:55:08.474309Z&quot;}" data-hidecode="true" data-hideprompt="true" data-hide_code="true" data-hide_input="true" data-slideshow="{&quot;slide_type&quot;:&quot;&quot;}" data-tags="[&quot;hide_code&quot;]" data-execution_count="233">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#echo: false</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#|include: false </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> myfunctions <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>myimports</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="233">
+<pre><code>&lt;function myfunctions.myimports()&gt;</code></pre>
+</div>
+</div>
+<section id="lectura-de-datos" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="lectura-de-datos"><span class="header-section-number">6.1</span> Lectura de datos</h2>
+<p>El primer set de datos que utilizaremos, consiste en los resultados <em>anónimos</em> de las Pruebas Saber PRO a nivel nacional, desde el año 2016 hasta el 2022,este conjunto de datos constituye nuestra <strong>población</strong> y lo llamaremos <code>pob</code></p>
+<div class="cell" data-tags="[&quot;hide_code&quot;]" data-execution_count="234">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>url<span class="op">=</span><span class="st">"poblacion2016-2022.csv"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pob <span class="op">=</span> pd.read_csv(url)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="235">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pob.sample(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="235">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">PERIODO</th>
+<th data-quarto-table-cell-role="th">ESTU_CONSECUTIVO</th>
+<th data-quarto-table-cell-role="th">ESTU_CODDANE_COLE_TERMINO</th>
+<th data-quarto-table-cell-role="th">ESTU_VALORMATRICULAUNIVERSIDAD</th>
+<th data-quarto-table-cell-role="th">ESTU_COMOCAPACITOEXAMENSB11</th>
+<th data-quarto-table-cell-role="th">ESTU_SEMESTRECURSA</th>
+<th data-quarto-table-cell-role="th">FAMI_EDUCACIONPADRE</th>
+<th data-quarto-table-cell-role="th">FAMI_EDUCACIONMADRE</th>
+<th data-quarto-table-cell-role="th">ESTU_HORASSEMANATRABAJA</th>
+<th data-quarto-table-cell-role="th">INST_COD_INSTITUCION</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">MOD_COMPETEN_CIUDADA_PUNT</th>
+<th data-quarto-table-cell-role="th">MOD_COMPETEN_CIUDADA_DESEM</th>
+<th data-quarto-table-cell-role="th">MOD_INGLES_PUNT</th>
+<th data-quarto-table-cell-role="th">MOD_INGLES_DESEM</th>
+<th data-quarto-table-cell-role="th">MOD_COMUNI_ESCRITA_PUNT</th>
+<th data-quarto-table-cell-role="th">MOD_COMUNI_ESCRITA_DESEM</th>
+<th data-quarto-table-cell-role="th">PUNT_GLOBAL</th>
+<th data-quarto-table-cell-role="th">filter_$</th>
+<th data-quarto-table-cell-role="th">ZPUNT_GLOBAL</th>
+<th data-quarto-table-cell-role="th">ZSco01</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">42233</td>
+<td>20195.0</td>
+<td>EK201950298359</td>
+<td>NaN</td>
+<td>Entre 1 millón y menos de 2.5 millones</td>
+<td>Repasó por cuenta propia</td>
+<td>9.0</td>
+<td>Secundaria (Bachillerato) completa</td>
+<td>Secundaria (Bachillerato) completa</td>
+<td>Más de 30 horas</td>
+<td>2725.0</td>
+<td>...</td>
+<td>98.0</td>
+<td>1.0</td>
+<td>161.0</td>
+<td>A2</td>
+<td>140.0</td>
+<td>2.0</td>
+<td>135.0</td>
+<td>Not Selected</td>
+<td>-0.509189</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1206174</td>
+<td>20163.0</td>
+<td>EK201630212233</td>
+<td>1.231680e+11</td>
+<td>Menos de 500 mil</td>
+<td>Repasó por cuenta propia</td>
+<td>8.0</td>
+<td>Secundaria (Bachillerato) completa</td>
+<td>Primaria incompleta</td>
+<td>0</td>
+<td>1202.0</td>
+<td>...</td>
+<td>147.0</td>
+<td>2.0</td>
+<td>139.0</td>
+<td>A1</td>
+<td>194.0</td>
+<td>4.0</td>
+<td>142.0</td>
+<td>Not Selected</td>
+<td>-0.225677</td>
+<td>0.122935</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">350342</td>
+<td>20163.0</td>
+<td>EK201630032134</td>
+<td>3.118480e+11</td>
+<td>Más de 7 millones</td>
+<td>No realizó ninguna prueba de preparación</td>
+<td>9.0</td>
+<td>Postgrado</td>
+<td>Educación profesional completa</td>
+<td>0</td>
+<td>1701.0</td>
+<td>...</td>
+<td>178.0</td>
+<td>3.0</td>
+<td>217.0</td>
+<td>B2</td>
+<td>166.0</td>
+<td>3.0</td>
+<td>187.0</td>
+<td>Not Selected</td>
+<td>1.596896</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1590935</td>
+<td>20212.0</td>
+<td>EK202120106740</td>
+<td>1.522330e+11</td>
+<td>Entre 2.5 millones y menos de 4 millones</td>
+<td>Repasó por cuenta propia</td>
+<td>8.0</td>
+<td>Ninguno</td>
+<td>Primaria incompleta</td>
+<td>Entre 21 y 30 horas</td>
+<td>1818.0</td>
+<td>...</td>
+<td>132.0</td>
+<td>2.0</td>
+<td>139.0</td>
+<td>A2</td>
+<td>203.0</td>
+<td>4.0</td>
+<td>150.0</td>
+<td>Not Selected</td>
+<td>0.098336</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1237000</td>
+<td>20163.0</td>
+<td>EK201630094133</td>
+<td>NaN</td>
+<td>Entre 1 millón y menos de 2.5 millones</td>
+<td>No realizó ninguna prueba de preparación</td>
+<td>10.0</td>
+<td>Secundaria (Bachillerato) completa</td>
+<td>Primaria completa</td>
+<td>Menos de 10 horas</td>
+<td>2823.0</td>
+<td>...</td>
+<td>114.0</td>
+<td>1.0</td>
+<td>117.0</td>
+<td>A-</td>
+<td>159.0</td>
+<td>3.0</td>
+<td>130.0</td>
+<td>Not Selected</td>
+<td>-0.711697</td>
+<td>-0.370672</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 34 columns</p>
+</div>
+</div>
+</div>
+<p>El segundo set de datos corresponde a los estudiantes pertenecientes a la <strong>UNIVERSIDAD DEL NORTE</strong> que presentaron la prueba entre el año 2021 y 2022, por lo tanto, es una <em>muestra</em> de la población total, a este set le llamaremos <code>sam</code> (sample).</p>
+<blockquote class="blockquote">
+<p>Es importante para futuros análisis tener en cuente que este es un <em>muestreo por conveniencia</em> en donde la muestra <em>no es necesariamente representativa ni aleatoria</em></p>
+</blockquote>
+<p>Esta información está segmentada en 3 archivos diferentes los cuales vamos a comparar y unificar.</p>
+<div class="cell" data-execution_count="236">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Esta informacion esta segmentada en 3 archivos diferentes. </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sam2021<span class="op">=</span>pd.read_csv(<span class="st">"un2021.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>sam2021_2<span class="op">=</span>pd.read_csv(<span class="st">"un2021_2.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>sam2022<span class="op">=</span>pd.read_csv(<span class="st">"un2022.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Concatenando los archivos</strong></p>
+<hr>
+<p>Para unificar estos 3 archivos, primero debemos compararlos entre sí para asegurar que contengan las mismas columnas.</p>
+<p>Primero comparamos los <code>sam2021</code>y <code>sam2021_2</code></p>
+<div class="cell" data-execution_count="237">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Comparación de Datasets</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cols_sam2021<span class="op">=</span><span class="bu">set</span>(sam2021.columns)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cols_sam2021_2<span class="op">=</span> <span class="bu">set</span>(sam2021_2.columns)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>common_cols<span class="op">=</span> cols_sam2021 <span class="op">&amp;</span> cols_sam2021_2</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"sam2021 tiene un total de </span><span class="sc">{</span>sam2021<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columnas"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"sam2021_2 tiene un total de </span><span class="sc">{</span>sam2021_2<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columnas"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Entre los dataframes comparados hay </span><span class="sc">{</span><span class="bu">len</span>(common_cols)<span class="sc">}</span><span class="ss"> columnas en comun"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>sam2021 tiene un total de 22 columnas
+sam2021_2 tiene un total de 22 columnas
+Entre los dataframes comparados hay 22 columnas en comun</code></pre>
+</div>
+</div>
+<p>Dado que los dos dataframes tienen las mismas columnas, procederemos a concatenarlos horizontalmente.</p>
+<div class="cell" data-execution_count="238">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sam21<span class="op">=</span>pd.concat([sam2021,sam2021_2], axis<span class="op">=</span><span class="dv">0</span>, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sam21.sample(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="238">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Periodo</th>
+<th data-quarto-table-cell-role="th">Aplicación</th>
+<th data-quarto-table-cell-role="th">Examen</th>
+<th data-quarto-table-cell-role="th">Tipo de documento</th>
+<th data-quarto-table-cell-role="th">Documento</th>
+<th data-quarto-table-cell-role="th">Nombre</th>
+<th data-quarto-table-cell-role="th">Número de registro</th>
+<th data-quarto-table-cell-role="th">Tipo de evaluado</th>
+<th data-quarto-table-cell-role="th">SNIES programa académico</th>
+<th data-quarto-table-cell-role="th">Programa</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Núcleo básico de conocimiento</th>
+<th data-quarto-table-cell-role="th">Puntaje global</th>
+<th data-quarto-table-cell-role="th">Percentil nacional global</th>
+<th data-quarto-table-cell-role="th">Percentil nacional nbc</th>
+<th data-quarto-table-cell-role="th">Módulo</th>
+<th data-quarto-table-cell-role="th">Puntaje módulo</th>
+<th data-quarto-table-cell-role="th">Nivel de desempeño</th>
+<th data-quarto-table-cell-role="th">Percentil nacional módulo</th>
+<th data-quarto-table-cell-role="th">Percentil grupo nbc módulo</th>
+<th data-quarto-table-cell-role="th">Novedades</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">30384</td>
+<td>20212</td>
+<td>PRO Y TYT 20212</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1001779658</td>
+<td>ANDRES EDUARDO CAMPO ARENAS</td>
+<td>EK202122697035</td>
+<td>Estudiante</td>
+<td>1276</td>
+<td>INGENIERIA INDUSTRIAL</td>
+<td>...</td>
+<td>INGENIERÍA INDUSTRIAL Y AFINES</td>
+<td>180</td>
+<td>91</td>
+<td>90.0</td>
+<td>FORMULACIÓN DE PROYECTOS DE INGENIERÍA</td>
+<td>171</td>
+<td>3</td>
+<td>79</td>
+<td>83.0</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3826</td>
+<td>20212</td>
+<td>PRO Y TYT 20212</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1083029545</td>
+<td>ANDREA CAMILA TRESPALACIOS GARCIA</td>
+<td>EK202120685057</td>
+<td>Estudiante</td>
+<td>1269</td>
+<td>MEDICINA</td>
+<td>...</td>
+<td>MEDICINA</td>
+<td>186</td>
+<td>95</td>
+<td>80.0</td>
+<td>RAZONAMIENTO CUANTITATIVO</td>
+<td>183</td>
+<td>3</td>
+<td>88</td>
+<td>70.0</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20854</td>
+<td>20212</td>
+<td>PRO Y TYT 20212</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1002212448</td>
+<td>YULIANY RUIZ PONCE</td>
+<td>EK202120815787</td>
+<td>Estudiante</td>
+<td>90329</td>
+<td>ARQUITECTURA</td>
+<td>...</td>
+<td>ARQUITECTURA</td>
+<td>178</td>
+<td>90</td>
+<td>89.0</td>
+<td>COMUNICACIÓN ESCRITA</td>
+<td>136</td>
+<td>2</td>
+<td>49</td>
+<td>54.0</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13835</td>
+<td>20212</td>
+<td>PRO Y TYT 20212</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1143164005</td>
+<td>DUVAN JAIR BUENO PATIÑO</td>
+<td>EK202122652865</td>
+<td>Estudiante</td>
+<td>9882</td>
+<td>ECONOMIA</td>
+<td>...</td>
+<td>ECONOMÍA</td>
+<td>81</td>
+<td>1</td>
+<td>1.0</td>
+<td>COMUNICACIÓN ESCRITA</td>
+<td>0</td>
+<td>NaN</td>
+<td>1</td>
+<td>1.0</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18637</td>
+<td>20212</td>
+<td>PRO Y TYT 20212</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1001912243</td>
+<td>SOFIA MARIA MARTINEZ QUINTERO</td>
+<td>EK202120426999</td>
+<td>Estudiante</td>
+<td>12075</td>
+<td>RELACIONES INTERNACIONALES</td>
+<td>...</td>
+<td>CIENCIA POLÍTICA, RELACIONES INTERNACIONALES</td>
+<td>200</td>
+<td>99</td>
+<td>88.0</td>
+<td>COMUNICACIÓN ESCRITA</td>
+<td>170</td>
+<td>3</td>
+<td>84</td>
+<td>56.0</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 22 columns</p>
+</div>
+</div>
+</div>
+<p>Ahora comparemos <code>sam21</code>con <code>sam2022</code></p>
+<div class="cell" data-execution_count="239">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Comparación de Datasets</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>cols_sam21<span class="op">=</span><span class="bu">set</span>(sam21.columns)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cols_sam2022<span class="op">=</span> <span class="bu">set</span>(sam2022.columns)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>common_cols<span class="op">=</span> cols_sam21 <span class="op">&amp;</span> cols_sam2022</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"sam21 tiene un total de </span><span class="sc">{</span>sam21<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columnas"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"sam2022 tiene un total de </span><span class="sc">{</span>sam2022<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columnas"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Entre los dataframes comparados hay </span><span class="sc">{</span><span class="bu">len</span>(common_cols)<span class="sc">}</span><span class="ss"> columnas en comun"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>sam21 tiene un total de 22 columnas
+sam2022 tiene un total de 24 columnas
+Entre los dataframes comparados hay 22 columnas en comun</code></pre>
+</div>
+</div>
+<p>Al parecer <code>sam2022</code> tiene 2 columnas diferentes a <code>sam21</code>, procedemos a identificarlas:</p>
+<div class="cell" data-execution_count="240">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dif_cols<span class="op">=</span> cols_sam2022 <span class="op">-</span> cols_sam21</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dif_cols</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="240">
+<pre><code>{'IES', 'SNIES_IES'}</code></pre>
+</div>
+</div>
+<p>Las columnas <code>'IES'</code> y <code>'SNIES_IES'</code> no aportan información valiosa, puesto que para nuestro proyecto, este dataset solo contiene información de estudiantes de Universidad del Norte. Por tal motivo, procederemos a <em>eliminar</em> estas columnas de<code>sam2022</code>y a concatenarlo con <code>sam2021</code> para así obtener <em>un solo</em> dataset con la muestra de Universidad del Norte.</p>
+<div class="cell" data-execution_count="241">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sam2022.drop(dif_cols, axis<span class="op">=</span><span class="dv">1</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sam2022.sample(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="241">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Periodo</th>
+<th data-quarto-table-cell-role="th">Aplicación</th>
+<th data-quarto-table-cell-role="th">Examen</th>
+<th data-quarto-table-cell-role="th">Tipo de documento</th>
+<th data-quarto-table-cell-role="th">Documento</th>
+<th data-quarto-table-cell-role="th">Nombre</th>
+<th data-quarto-table-cell-role="th">Número de registro</th>
+<th data-quarto-table-cell-role="th">Tipo de evaluado</th>
+<th data-quarto-table-cell-role="th">SNIES programa académico</th>
+<th data-quarto-table-cell-role="th">Programa</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Núcleo básico de conocimiento</th>
+<th data-quarto-table-cell-role="th">Puntaje global</th>
+<th data-quarto-table-cell-role="th">Percentil nacional global</th>
+<th data-quarto-table-cell-role="th">Percentil nacional nbc</th>
+<th data-quarto-table-cell-role="th">Módulo</th>
+<th data-quarto-table-cell-role="th">Puntaje módulo</th>
+<th data-quarto-table-cell-role="th">Nivel de desempeño</th>
+<th data-quarto-table-cell-role="th">Percentil nacional módulo</th>
+<th data-quarto-table-cell-role="th">Percentil grupo nbc módulo</th>
+<th data-quarto-table-cell-role="th">Novedades</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12501</td>
+<td>20225</td>
+<td>SABER PRO 2022-2</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1001903903</td>
+<td>CARLOS EDUARDO ALVAREZ MUÑOZ</td>
+<td>EK202251145325</td>
+<td>Estudiante</td>
+<td>1277</td>
+<td>INGENIERIA MECANICA</td>
+<td>...</td>
+<td>INGENIERÍA MECÁNICA Y AFINES</td>
+<td>212</td>
+<td>100</td>
+<td>98.0</td>
+<td>COMUNICACIÓN ESCRITA</td>
+<td>175</td>
+<td>3</td>
+<td>92</td>
+<td>90.0</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13202</td>
+<td>20225</td>
+<td>SABER PRO 2022-2</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1001941312</td>
+<td>MARIA ALEJANDRA PLATA GUTIERREZ</td>
+<td>EK202251201557</td>
+<td>Estudiante</td>
+<td>12075</td>
+<td>RELACIONES INTERNACIONALES</td>
+<td>...</td>
+<td>CIENCIA POLÍTICA, RELACIONES INTERNACIONALES</td>
+<td>169</td>
+<td>81</td>
+<td>43.0</td>
+<td>INVESTIGACIÓN EN CIENCIAS SOCIALES</td>
+<td>157</td>
+<td>2</td>
+<td>64</td>
+<td>36.0</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">304</td>
+<td>20222</td>
+<td>SABER PRO 2022-1</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1002160172</td>
+<td>MARIA MARGARITA MAESTRE AMAYA</td>
+<td>EK202220903120</td>
+<td>Estudiante</td>
+<td>2519</td>
+<td>COMUNICACION SOCIAL Y PERIODISMO</td>
+<td>...</td>
+<td>COMUNICACIÓN SOCIAL, PERIODISMO Y AFINES</td>
+<td>158</td>
+<td>71</td>
+<td>58.0</td>
+<td>RAZONAMIENTO CUANTITATIVO</td>
+<td>143</td>
+<td>2</td>
+<td>48</td>
+<td>53.0</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4665</td>
+<td>20225</td>
+<td>SABER PRO 2022-2</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1192911534</td>
+<td>LUIS FERNANDO VIAÑA CAMARGO</td>
+<td>EK202250389296</td>
+<td>Estudiante</td>
+<td>1273</td>
+<td>INGENIERIA CIVIL</td>
+<td>...</td>
+<td>INGENIERÍA CIVIL Y AFINES</td>
+<td>179</td>
+<td>90</td>
+<td>85.0</td>
+<td>PENSAMIENTO CIENTÍFICO - CIENCIAS FÍSICAS</td>
+<td>166</td>
+<td>3</td>
+<td>89</td>
+<td>93.0</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5735</td>
+<td>20225</td>
+<td>SABER PRO 2022-2</td>
+<td>Saber Pro</td>
+<td>CC</td>
+<td>1002494620</td>
+<td>JENNYS JHOANNA HERRERA QUIROZ</td>
+<td>EK202250476507</td>
+<td>Estudiante</td>
+<td>1269</td>
+<td>MEDICINA</td>
+<td>...</td>
+<td>MEDICINA</td>
+<td>167</td>
+<td>79</td>
+<td>52.0</td>
+<td>ATENCIÓN EN SALUD</td>
+<td>206</td>
+<td>4</td>
+<td>95</td>
+<td>88.0</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 22 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="242">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sam<span class="op">=</span>pd.concat([sam21,sam2022], axis<span class="op">=</span><span class="dv">0</span>, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>myText(<span class="st">"El nuevo dataset que contiene la muestra de estudiantes Uninorte en los periodos 2021 y 2022 contiene </span><span class="sc">{sam.shape[0]}</span><span class="st"> registros y </span><span class="sc">{sam.shape[1]}</span><span class="st"> columnas"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:16px;">
+El nuevo dataset que contiene la muestra de estudiantes Uninorte en los periodos 2021 y 2022 contiene {sam.shape[0]} registros y {sam.shape[1]} columnas
+</p>
+</div>
+</div>
+</section>
+<section id="descripción-y-exploración-de-variables" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="descripción-y-exploración-de-variables"><span class="header-section-number">6.2</span> Descripción y exploración de Variables</h2>
+<section id="sam-muestra-de-estudiantes-uninorte" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="sam-muestra-de-estudiantes-uninorte"><span class="header-section-number">6.2.1</span> <code>sam</code> muestra de estudiantes Uninorte</h3>
+<p>Conozcamos el contenido del este set de datos. Empezamos por revisar qué columnas tiene, qué significan y el tipo de dato que en estos momentos se reconoce en cada una de ellas, en este momento identificamos si es pertinente realizarles algun ajuste.</p>
+<div class="cell" data-execution_count="243">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sam.dtypes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="243">
+<pre><code>Periodo                               int64
+Aplicación                           object
+Examen                               object
+Tipo de documento                    object
+Documento                            object
+Nombre                               object
+Número de registro                   object
+Tipo de evaluado                     object
+SNIES programa académico              int64
+Programa                             object
+Ciudad                               object
+Id núcleo básico de conocimiento      int64
+Núcleo básico de conocimiento        object
+Puntaje global                        int64
+Percentil nacional global             int64
+Percentil nacional nbc              float64
+Módulo                               object
+Puntaje módulo                        int64
+Nivel de desempeño                   object
+Percentil nacional módulo             int64
+Percentil grupo nbc módulo          float64
+Novedades                            object
+dtype: object</code></pre>
+</div>
+</div>
+<section id="periodo-obj" class="level4" data-number="6.2.1.1">
+<h4 data-number="6.2.1.1" class="anchored" data-anchor-id="periodo-obj"><span class="header-section-number">6.2.1.1</span> <code>Periodo</code> [obj]</h4>
+<p>Este dato esta compuesto por el año de presentación de la prueba y a veces incluye un dígito que indica un periodo de realización de la misma ya que en un mismo año pueden abrirse varias convocatorias.</p>
+<p>Para este análisis necesitamos que el <code>Periodo</code> solo contenga el <em>año de presentación de la prueba</em> y que sea de naturaleza <em>“categórica”</em></p>
+<p>Usaremos una funcion personalizada para este propósito.</p>
+<div class="cell" data-execution_count="244">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Periodo_to4digits(sam,<span class="st">'Periodo'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="244">
+<pre><code>43943    2022
+15694    2021
+47175    2022
+11078    2021
+1382     2021
+Name: Periodo, dtype: object</code></pre>
+</div>
+</div>
+<p>Confirmamos que la información corresponde al año de presentación de la prueba y ahora es de tipo <code>Object</code></p>
+<p>Usaremos otra función personalizada para revisar valores nulos y únicos de esta columna</p>
+<div class="cell" data-execution_count="245">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 2 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Periodo</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2021</td>
+<td>32844</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2022</td>
+<td>15661</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="aplicación-obj" class="level4" data-number="6.2.1.2">
+<h4 data-number="6.2.1.2" class="anchored" data-anchor-id="aplicación-obj"><span class="header-section-number">6.2.1.2</span> <code>Aplicación</code> [obj]</h4>
+<p>Este campo indica la convocatoria específica del año en el que presentó la prueba. Este campo no parece ser relevante para nuestro análisis. por lo tanto será eliminado posteriormente.</p>
+<div class="cell" data-execution_count="246">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 6 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Aplicación</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PRO Y TYT 20212</td>
+<td>31754</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">SABER PRO 2022-2</td>
+<td>14632</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">SABER PRO Y TYT EXTERIOR - 20213</td>
+<td>1090</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">SABER PRO Y TYT EXTERIOR - 20222</td>
+<td>590</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">SABER PRO 2022-1</td>
+<td>419</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">SABER TYT 2022-2</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Sus valores únicos son:</p>
+<div class="cell" data-execution_count="247">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Aplicación'</span>,<span class="st">'Aplicacion'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Aplicación</code> por <code>Aplicacion</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="examen-obj" class="level4" data-number="6.2.1.3">
+<h4 data-number="6.2.1.3" class="anchored" data-anchor-id="examen-obj"><span class="header-section-number">6.2.1.3</span> <code>Examen</code> [obj]</h4>
+<p>Este campo indica la prueba presentada por el estudiante. En la Universidad del Norte solo se aplican pruebas <em>Saber Pro</em> que corresponden a la oferta de programas de pregrado. Al revisar los valores de esta variable, encontramos 20 registros de Examen tipo <em>Saber TyT</em>, los cuales representan atípicos, ya que la institución no ofrece carreras Técnicas ni Tecnológicas.</p>
+<div class="cell" data-execution_count="248">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 2 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Examen</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Saber Pro</td>
+<td>48485</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Saber TyT</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Como estos datos representan el solo el <em>0.04%</em> del total de registros procederemos a eliminarlos.</p>
+</section>
+<section id="tipo-de-documento-obj" class="level4" data-number="6.2.1.4">
+<h4 data-number="6.2.1.4" class="anchored" data-anchor-id="tipo-de-documento-obj"><span class="header-section-number">6.2.1.4</span> <code>Tipo de documento</code> [obj]</h4>
+<p>Este campo hace referencia al tipo de documento de identidad que el estudiante tiene vigente al momento de presentar la prueba. No se identifican valores atípicos en este campo. Este campo no aporta significativamente al análisis que realizaremos por lo que es susceptible a ser eliminado en etapas posteriores.</p>
+<div class="cell" data-execution_count="249">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 5 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Tipo de documento</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">CC</td>
+<td>48135</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CE</td>
+<td>168</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">TI</td>
+<td>111</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PE</td>
+<td>83</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PPT</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="250">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Tipo de documento'</span>,<span class="st">'Tipo_Documento'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Tipo de documento</code> por <code>Tipo_Documento</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="documento-obj" class="level4" data-number="6.2.1.5">
+<h4 data-number="6.2.1.5" class="anchored" data-anchor-id="documento-obj"><span class="header-section-number">6.2.1.5</span> <code>Documento</code> [obj]</h4>
+<p>Este campo contiene el número de documento de identidad del estudiante. Aunque en sí mismo no aporta información relevante para el análisis, es <strong>muy importante</strong> porque nos permite consultar las bases de datos institucionales para agregar variables académicas a nuestro estudio.</p>
+<p>Este valor <strong>debería ser único</strong>, es decir, cada registro de nuestro dataset debería representar a un estudiante, sin embargo nuestro dataset tiene registros repetidos porque está estructurado de manera que cada registro es una prueba diferente. Esto significa que debemos restructurar el dataset.</p>
+<div class="cell" data-execution_count="251">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+El dataset tiene 48505 registros, de los cuales 4791 son únicos, es decir, el 9.88%.
+</p>
+</div>
+</div>
+</section>
+<section id="nombre-obj" class="level4" data-number="6.2.1.6">
+<h4 data-number="6.2.1.6" class="anchored" data-anchor-id="nombre-obj"><span class="header-section-number">6.2.1.6</span> <code>Nombre</code> [obj]</h4>
+<p>Este campo indica el nombre completo del estudiante. Aunque no es relevante en el análisis, es importante contar con esta información para hacer las validaciones finales.</p>
+<div class="cell" data-execution_count="252">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 4791 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Nombre</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INES MARCELA SUAREZ ROJAS</td>
+<td>30</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">VALENTINA ANDREA MADARIAGA PEREZ</td>
+<td>22</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">VANESSA BALDOVINO CHAVEZ</td>
+<td>22</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">LAURA CECILIA NAME CAMARGO</td>
+<td>22</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MIGUEL ANGEL REALES OYUELA</td>
+<td>22</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MARIA CLAUDIA CHINCHILLA VELEZ</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MARÍA JOSÉ BARRIOS BAZA</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">JOSE DAVID SANTIAGO HERNÁNDEZ</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MARCELA CAROLINA ORTEGA ARAGÓN</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">JUAN JAVIER JARABA PARRA</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+<p>4791 rows × 1 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="número-de-registro-obj" class="level4" data-number="6.2.1.7">
+<h4 data-number="6.2.1.7" class="anchored" data-anchor-id="número-de-registro-obj"><span class="header-section-number">6.2.1.7</span> <code>Número de registro</code> [obj]</h4>
+<p>Un número único asignado a cada estudiante que toma una prueba de Estado, en nuestro caso: Saber Pro. Este identificador es esencial para consultar los resultados de la evaluación.</p>
+<p>Esta variable no es relevante para el análisis, pero será de utilidad para el cruce de información con el dataset de la población.</p>
+<div class="cell" data-execution_count="253">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 4821 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Número de registro</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EK202120012963</td>
+<td>14</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">EK202122194801</td>
+<td>14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EK202121328079</td>
+<td>14</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">EK202122192623</td>
+<td>14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EK202122193217</td>
+<td>14</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EK202250632802</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">EK202250613794</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EK202250612697</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">EK202250560524</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EK202260013466</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+<p>4821 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<p>Para evitar errores futuros vamos a ajustar el nombre del campo a <code>numero_registro</code></p>
+<div class="cell" data-execution_count="254">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Número de registro'</span>,<span class="st">'Numero_Registro'</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Número de registro</code> por <code>Numero_Registro</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="tipo-de-evaluado-obj" class="level4" data-number="6.2.1.8">
+<h4 data-number="6.2.1.8" class="anchored" data-anchor-id="tipo-de-evaluado-obj"><span class="header-section-number">6.2.1.8</span> <code>Tipo de evaluado</code> [obj]</h4>
+<p>Corresponde a la modalidad de la inscripción, si es <em>Estudiante</em> indica que la persona que presenta la prueba está actualmente estudiando en la institución y sus resultados se tienen en cuenta para evaluar la calidad de la IES. Por el contrario si es <em>Individual</em> significa que el evaluado se inscribió por cuenta propia y no en representación de una institución.</p>
+<p>Particularme los estudiantes de Uninorte debes inscribirse en modalidad <em>Estudiante</em>, no deberían existir registros de categoría <em>Individual</em>.</p>
+<div class="cell" data-execution_count="255">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 2 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Tipo de evaluado</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Estudiante</td>
+<td>48325</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Individual</td>
+<td>180</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="256">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Tipo de evaluado'</span>, <span class="st">'Tipo_Evaluado'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Tipo de evaluado</code> por <code>Tipo_Evaluado</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="snies-programa-académico-obj" class="level4" data-number="6.2.1.9">
+<h4 data-number="6.2.1.9" class="anchored" data-anchor-id="snies-programa-académico-obj"><span class="header-section-number">6.2.1.9</span> <code>SNIES programa académico</code> [obj]</h4>
+<p>El SNIES es Es el Sistema Nacional de Información de la Educación Superior reglamentado mediante Decreto 1767 de 2006 con el propósito de recoger, organizar, consolidar y divulgar información sobre educación superior. Cada programa académico debidamente registrado en el SNIES tiene un código único que lo identifica ante el Ministerio de Educación Nacional.</p>
+<p>Este campo no aporta al análisis pero permite identificar los programas académicos de la Universidad del Norte. Se considera un dato de naturaleza <code>Categorica  No Ordinal</code>, procederemo realizar la transformación correspondiente.</p>
+<div class="cell" data-execution_count="257">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sam[<span class="st">'SNIES programa académico'</span>]<span class="op">=</span> sam[<span class="st">'SNIES programa académico'</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>sam[<span class="st">'SNIES programa académico'</span>].dtype</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="257">
+<pre><code>dtype('O')</code></pre>
+</div>
+</div>
+<p>Para evitar errores en los próximos pasos de procesamiento, vamos a ajustar el nombre de esta columna a <code>SNIES_Programa</code></p>
+<div class="cell" data-execution_count="258">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'SNIES programa académico'</span>, <span class="st">'SNIES_Programa'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>SNIES programa académico</code> por <code>SNIES_Programa</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="programa-obj" class="level4" data-number="6.2.1.10">
+<h4 data-number="6.2.1.10" class="anchored" data-anchor-id="programa-obj"><span class="header-section-number">6.2.1.10</span> <code>Programa</code> [obj]</h4>
+<p>Contiene el nombre del programa académico del estudiante que presentó la prueba.</p>
+<p>En Uninorte no existen los programas: <code>TECNOLOGIA EN REDES DE COMUNICACIONES</code>, ni <code>TECNOLOGIA EN PROCESOS INDUSTRIALES</code>, por lo tanto, estos registros deberán ser eliminados.</p>
+<div class="cell" data-execution_count="259">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 31 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Programa</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INGENIERIA CIVIL</td>
+<td>4925</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MEDICINA</td>
+<td>4820</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INGENIERIA INDUSTRIAL</td>
+<td>4558</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ADMINISTRACION DE EMPRESAS</td>
+<td>4442</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PSICOLOGIA</td>
+<td>3430</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">COMUNICACION SOCIAL Y PERIODISMO</td>
+<td>2900</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DERECHO</td>
+<td>2895</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERIA MECANICA</td>
+<td>2764</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">NEGOCIOS INTERNACIONALES</td>
+<td>2262</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CONTADURIA PUBLICA</td>
+<td>1934</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INGENIERIA DE SISTEMAS Y COMPUTACION</td>
+<td>1822</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ARQUITECTURA</td>
+<td>1596</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INGENIERIA ELECTRONICA</td>
+<td>1453</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">GEOLOG¿A</td>
+<td>1199</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ENFERMERIA</td>
+<td>1113</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DISEÑO GRAFICO</td>
+<td>1006</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">RELACIONES INTERNACIONALES</td>
+<td>972</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERIA ELECTRICA</td>
+<td>813</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ODONTOLOGÍA</td>
+<td>671</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ECONOMIA</td>
+<td>619</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">CIENCIA POLITICA Y GOBIERNO</td>
+<td>614</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">LICENCIATURA EN PEDAGOGIA INFANTIL</td>
+<td>476</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DISEÑO INDUSTRIAL</td>
+<td>362</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MÚSICA</td>
+<td>275</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">LENGUAS MODERNAS Y CULTURA</td>
+<td>265</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MATEMATICAS</td>
+<td>174</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">FILOSOFÍA Y HUMANIDADES</td>
+<td>105</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">LICENCIATURA EN FILOSOF¿A Y HUMANIDADES</td>
+<td>15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">TECNOLOGIA EN REDES DE COMUNICACIONES</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">TECNOLOGIA EN PROCESOS INDUSTRIALES</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">LICENCIATURA EN EDUCACION INFANTIL</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>Ciudad</code>: Indica la ciudad de la IES a la que pertenece el estudiante evaluado. En este caso particular todos los registros deben indicar <code>Barranquilla</code></p>
+<div class="cell" data-execution_count="260">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 1 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Ciudad</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">BARRANQUILLA</td>
+<td>48505</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="id-núcleo-básico-de-conocimiento-obj" class="level4" data-number="6.2.1.11">
+<h4 data-number="6.2.1.11" class="anchored" data-anchor-id="id-núcleo-básico-de-conocimiento-obj"><span class="header-section-number">6.2.1.11</span> <code>Id núcleo básico de conocimiento</code> [obj]</h4>
+<p>El Núcleo Básico del Conocimiento (NBC) es una clasificación que organiza un área del conocimiento en sus campos, disciplinas o profesiones fundamentales. Todos los programas de educación superior registrados en el Ministerio de Educación Nacional (MEN) se integran al SNIES, una base de datos pública que recoge información básica sobre cada programa y lo vincula a un NBC específico.</p>
+<p>El Icfes ha definido que la oferta de módulos específicos del examen Saber Pro se basa en la combinación del NBC y el nivel de formación del programa en cuestión, según la clasificación del SNIES del MEN. Esto permite a los evaluados comparar sus resultados en cada módulo, ya sea genérico o específico, con los de otros participantes evaluados dentro del mismo NBC ( <span class="citation" data-cites="Icfes2024_II">Icfes (<a href="8_references.html#ref-Icfes2024_II" role="doc-biblioref">2024a</a>)</span> ).</p>
+<p>Este campo contiene el ID que identifica que NBC al que pertenece el programa académico del estudiante evaluado, aunque es un número entero, realmente representa una <em>categoría</em> por lo que ajustaremos el tipo de dato y el nombre del campo.</p>
+<div class="cell" data-execution_count="261">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>sam[<span class="st">'Id núcleo básico de conocimiento'</span>]<span class="op">=</span> sam[<span class="st">'Id núcleo básico de conocimiento'</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>sam[<span class="st">'Id núcleo básico de conocimiento'</span>].dtype</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="261">
+<pre><code>dtype('O')</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="262">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 25 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Id núcleo básico de conocimiento</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">9</td>
+<td>5244</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25</td>
+<td>4925</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">45</td>
+<td>4820</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">30</td>
+<td>4563</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">66</td>
+<td>3430</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">57</td>
+<td>2900</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">59</td>
+<td>2895</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">31</td>
+<td>2764</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">11</td>
+<td>2079</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">12</td>
+<td>1934</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">27</td>
+<td>1822</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">18</td>
+<td>1596</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">56</td>
+<td>1586</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">29</td>
+<td>1468</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>1368</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">36</td>
+<td>1199</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">41</td>
+<td>1113</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">28</td>
+<td>813</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">47</td>
+<td>671</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>491</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>275</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">64</td>
+<td>265</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">37</td>
+<td>174</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">68</td>
+<td>105</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">99</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="263">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Id núcleo básico de conocimiento'</span>,<span class="st">'ID_NBC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Id núcleo básico de conocimiento</code> por <code>ID_NBC</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="núcleo-básico-de-conocimiento-obj" class="level4" data-number="6.2.1.12">
+<h4 data-number="6.2.1.12" class="anchored" data-anchor-id="núcleo-básico-de-conocimiento-obj"><span class="header-section-number">6.2.1.12</span> <code>Núcleo básico de conocimiento</code> [obj]</h4>
+<p>Describe el nombre del NBC al que pertenece el programa académico del evaluado.</p>
+<div class="cell" data-execution_count="264">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Núcleo básico de conocimiento'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 25 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Núcleo básico de conocimiento</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ADMINISTRACIÓN</td>
+<td>5244</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERÍA CIVIL Y AFINES</td>
+<td>4925</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MEDICINA</td>
+<td>4820</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERÍA INDUSTRIAL Y AFINES</td>
+<td>4563</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PSICOLOGÍA</td>
+<td>3430</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">COMUNICACIÓN SOCIAL, PERIODISMO Y AFINES</td>
+<td>2900</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DERECHO Y AFINES</td>
+<td>2895</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERÍA MECÁNICA Y AFINES</td>
+<td>2764</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ECONOMÍA</td>
+<td>2079</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CONTADURÍA PUBLICA</td>
+<td>1934</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INGENIERÍA DE SISTEMAS, TELEMÁTICA Y AFINES</td>
+<td>1822</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ARQUITECTURA</td>
+<td>1596</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">CIENCIA POLÍTICA, RELACIONES INTERNACIONALES</td>
+<td>1586</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERÍA ELECTRÓNICA, TELECOMUNICACIONES Y AFINES</td>
+<td>1468</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DISEÑO</td>
+<td>1368</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">GEOLOGÍA, OTROS PROGRAMAS DE CIENCIAS NATURALES</td>
+<td>1199</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ENFERMERÍA</td>
+<td>1113</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INGENIERÍA ELÉCTRICA Y AFINES</td>
+<td>813</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ODONTOLOGÍA</td>
+<td>671</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">EDUCACIÓN</td>
+<td>491</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MÚSICA</td>
+<td>275</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">LENGUAS MODERNAS, LITERATURA, LINGÜÍSTICA Y AFINES</td>
+<td>265</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MATEMÁTICAS, ESTADÍSTICA Y AFINES</td>
+<td>174</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FILOSOFÍA, TEOLOGÍA Y AFINES</td>
+<td>105</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">SIN CLASIFICAR</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="265">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam, <span class="st">'Núcleo básico de conocimiento'</span>, <span class="st">'NBC'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Núcleo básico de conocimiento</code> por <code>NBC</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="puntaje-global-int64" class="level4" data-number="6.2.1.13">
+<h4 data-number="6.2.1.13" class="anchored" data-anchor-id="puntaje-global-int64"><span class="header-section-number">6.2.1.13</span> <code>Puntaje Global</code> [Int64]</h4>
+<p>El puntaje global en la prueba Saber Pro es un indicador que resume el desempeño general de un estudiante en las diferentes competencias evaluadas por el examen ( <span class="citation" data-cites="Icfes2024">Icfes (<a href="8_references.html#ref-Icfes2024" role="doc-biblioref">2024c</a>)</span> ).</p>
+<p>Este puntaje se calcula a partir de los resultados obtenidos en los módulos obligatorios, <em>lectura crítica</em>, <em>razonamiento cuantitativo</em>, <em>competencias ciudadanas</em>, <em>comunicación escrita</em> e <em>inglés</em>, calculando un promedio simple. <strong>Este valor puede variar entre 0 y 300 puntos</strong> ( <span class="citation" data-cites="Icfes2024_II">Icfes (<a href="8_references.html#ref-Icfes2024_II" role="doc-biblioref">2024a</a>)</span>).</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Este campo contiene la variable objetivo más importante de nuestros análisis</p>
+</div>
+</div>
+<div class="cell" data-execution_count="266">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Puntaje global'</span>,<span class="st">'PG'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Puntaje global</code> por <code>PG</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="percentil-nacional-global-int64" class="level4" data-number="6.2.1.14">
+<h4 data-number="6.2.1.14" class="anchored" data-anchor-id="percentil-nacional-global-int64"><span class="header-section-number">6.2.1.14</span> <code>Percentil nacional global</code> [Int64]:</h4>
+<p>Indica el porcentaje de estudiantes a nivel nacional que presentaron el examen con puntajes inferiores al obtenido por la persona evaluada ( <span class="citation" data-cites="Icfes2024_II">Icfes (<a href="8_references.html#ref-Icfes2024_II" role="doc-biblioref">2024a</a>)</span> ).</p>
+<div class="cell" data-execution_count="267">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 100 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Percentil nacional global</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">97</td>
+<td>2410</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">98</td>
+<td>2212</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">100</td>
+<td>2201</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">96</td>
+<td>2135</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">94</td>
+<td>2045</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>66</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>47</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>44</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>38</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17</td>
+<td>34</td>
+</tr>
+</tbody>
+</table>
+
+<p>100 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="268">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Percentil nacional global</code> por <code>Perc_Global</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="percentil-nacional-nbc-int32" class="level4" data-number="6.2.1.15">
+<h4 data-number="6.2.1.15" class="anchored" data-anchor-id="percentil-nacional-nbc-int32"><span class="header-section-number">6.2.1.15</span> <code>Percentil nacional nbc</code> [Int32]</h4>
+<p>Indica el porcentaje de estudiantes a nivel nacional y <strong>del mismo NBC</strong> que presentaron el examen con puntajes inferiores al obtenido por la persona evaluada.</p>
+<div class="cell" data-execution_count="269">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 180 registros nulos y 100 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Percentil nacional nbc</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">99.0</td>
+<td>1836</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">96.0</td>
+<td>1745</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">97.0</td>
+<td>1724</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">100.0</td>
+<td>1685</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">98.0</td>
+<td>1564</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">33.0</td>
+<td>88</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">12.0</td>
+<td>82</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">15.0</td>
+<td>79</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13.0</td>
+<td>70</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">9.0</td>
+<td>65</td>
+</tr>
+</tbody>
+</table>
+
+<p>100 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="270">
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Percentil nacional nbc</code> por <code>Perc_NBC</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+<p>Este valor está en formato <code>float</code>, vamos a convertilo a <code>Int</code>: como tiene valores nulos, vamos a imputarlos por <code>0</code> (verificando que no hayan valores en 0 preexistentes), para posteriormente hacer la conversión a <code>Int</code>. En una etapa posterior se le dará manejo a estos valores en cero (0)</p>
+<div class="cell" data-execution_count="271">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sam[sam[<span class="st">'Perc_NBC'</span>]<span class="op">==</span><span class="dv">0</span>].count().<span class="bu">sum</span>()<span class="op">&gt;</span><span class="dv">0</span>:  <span class="co">#Verificar si el Dataset tiene valores 0.</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">'El dataset tiene valores iguales a 0, no se recomienda imputar Nulls'</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>: <span class="co">#Si no los tiene, vamos a reemplazar los NUll/NAN por 0 y le daremos manejo posteriormente.</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    sam[<span class="st">'Perc_NBC'</span>] <span class="op">=</span> sam[<span class="st">'Perc_NBC'</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    sam[<span class="st">'Perc_NBC'</span>] <span class="op">=</span> sam[<span class="st">'Perc_NBC'</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Se ha realizado la imputación correctamente'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Se ha realizado la imputación correctamente</code></pre>
+</div>
+</div>
+</section>
+<section id="módulo-obj" class="level4" data-number="6.2.1.16">
+<h4 data-number="6.2.1.16" class="anchored" data-anchor-id="módulo-obj"><span class="header-section-number">6.2.1.16</span> <code>Módulo</code> [Obj]</h4>
+<p>Un Módulo o Prueba es un conjunto de ítems asociado a un área de evaluación que busca medir competencias ( <span class="citation" data-cites="Icfes2024_glos">Icfes (<a href="8_references.html#ref-Icfes2024_glos" role="doc-biblioref">2024b</a>)</span> ). El examen Saber Pro tiene un componente <em>Genérico</em> que consta de 5 Módulos o Pruebas:</p>
+<ul>
+<li>Competencias Ciudadanas</li>
+<li>Comunicación Escrita</li>
+<li>Inglés</li>
+<li>Lectura Crítica</li>
+<li>Razonamiento Cuantitativo</li>
+</ul>
+<p>Adicional a estos, el Icfes ha dispuesto que la oferta de módulos específicos del examen Saber Pro, está definida por la combinación del Núcleo Básico del Conocimiento (NBC) y el nivel de formación establecido para cada programa de acuerdo con la clasificación SNIES del MEN ( <span class="citation" data-cites="Icfes2024_modulos">Icfes (<a href="8_references.html#ref-Icfes2024_modulos" role="doc-biblioref">2024d</a>)</span> ).</p>
+<div class="cell" data-execution_count="272">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Módulo'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 36 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Módulo</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">COMPETENCIAS CIUDADANAS</td>
+<td>7401</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">COMUNICACIÓN ESCRITA</td>
+<td>7401</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INGLÉS</td>
+<td>7401</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">LECTURA CRÍTICA</td>
+<td>7401</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">RAZONAMIENTO CUANTITATIVO</td>
+<td>7401</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FORMULACIÓN DE PROYECTOS DE INGENIERÍA</td>
+<td>1852</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ATENCIÓN EN SALUD</td>
+<td>790</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DISEÑO DE OBRAS DE INFRAESTRUCTURA</td>
+<td>639</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">FUNDAMENTACIÓN EN DIAGNÓSTICO Y TRATAMIENTO MÉDICOS</td>
+<td>628</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PENSAMIENTO CIENTÍFICO - CIENCIAS FÍSICAS</td>
+<td>589</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DISEÑO DE SISTEMAS PRODUCTIVOS Y LOGÍSTICOS</td>
+<td>582</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ANÁLISIS DE PROBLEMÁTICAS PSICOLÓGICAS</td>
+<td>555</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">GESTIÓN FINANCIERA</td>
+<td>538</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">GESTIÓN DE ORGANIZACIONES</td>
+<td>472</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PROCESOS COMUNICATIVOS</td>
+<td>455</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">INVESTIGACIÓN JURÍDICA</td>
+<td>381</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">COMUNICACIÓN JURÍDICA</td>
+<td>381</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PROMOCIÓN DE LA SALUD Y PREVENCIÓN DE LA ENFERMEDAD</td>
+<td>356</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DISEÑO DE SISTEMAS MECÁNICOS</td>
+<td>330</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FORMULACIÓN, EVALUACIÓN Y GESTIÓN DE PROYECTOS</td>
+<td>286</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DISEÑO DE SISTEMAS DE CONTROL</td>
+<td>282</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PENSAMIENTO CIENTÍFICO - MATEMÁTICAS Y ESTADÍSTICA</td>
+<td>260</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INFORMACIÓN Y CONTROL CONTABLE</td>
+<td>252</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DISEÑO DE SOFTWARE</td>
+<td>235</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">INVESTIGACIÓN EN CIENCIAS SOCIALES</td>
+<td>231</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ESTUDIO PROYECTUAL</td>
+<td>229</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">GENERACIÓN DE ARTEFACTOS</td>
+<td>218</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PROYECTO DE ARQUITECTURA</td>
+<td>212</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">PENSAMIENTO CIENTÍFICO - CIENCIAS DE LA TIERRA</td>
+<td>194</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">CUIDADO DE ENFERMERÍA EN LOS ÁMBITOS CLÍNICO Y COMUNITARIO</td>
+<td>132</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">GESTIÓN DEL CONFLICTO</td>
+<td>103</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ANÁLISIS ECONÓMICO</td>
+<td>99</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DIAGNÓSTICO Y TRATAMIENTO EN SALUD ORAL</td>
+<td>78</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FORMAR</td>
+<td>63</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">EVALUAR</td>
+<td>63</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">ENSEÑAR</td>
+<td>15</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="273">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Módulo'</span>,<span class="st">'Modulo'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Módulo</code> por <code>Modulo</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="puntaje-módulo-int64" class="level4" data-number="6.2.1.17">
+<h4 data-number="6.2.1.17" class="anchored" data-anchor-id="puntaje-módulo-int64"><span class="header-section-number">6.2.1.17</span> <code>Puntaje módulo</code> [Int64]</h4>
+<p>Valora el puntaje obtenido por el estudiante en un módulo o prueba específica.</p>
+<p>El promedio de los puntajes obtenidos en los 5 módulos principales constituye el <em>Puntaje Global</em>, por esta razón esta variable es muy importante para nuestro análisis.</p>
+<div class="cell" data-execution_count="274">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Puntaje módulo'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 196 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Puntaje módulo</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1235</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">179</td>
+<td>678</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">190</td>
+<td>658</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">184</td>
+<td>654</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">188</td>
+<td>650</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">63</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">244</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">60</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">240</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">247</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+<p>196 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="275">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Puntaje módulo'</span>, <span class="st">'PM'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Puntaje módulo</code> por <code>PM</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Este campo contiene variables objetivos que son importantes para el análisis</p>
+</div>
+</div>
+</section>
+<section id="nivel-de-desempeño-obj" class="level4" data-number="6.2.1.18">
+<h4 data-number="6.2.1.18" class="anchored" data-anchor-id="nivel-de-desempeño-obj"><span class="header-section-number">6.2.1.18</span> <code>Nivel de desempeño</code> [Obj]</h4>
+<p>Es un resultado con descripciones cualitativas de las habilidades y conocimientos del estudiante de acuerdo con el puntje obtenido en cada una de las pruebas. Para estar ubicado en un nivel, se requiere haber superado los anteriores y la complejidad de los niveles es crenciente (el nivel 4 y B+ son los niveles mas altos).</p>
+<p>Es importante destacadar que cada prueba tiene sus propios niveles de desempeño, por lo que no son comparables entre sí de manera directa.</p>
+<p>La consideramos entonces una <em>variable categórica ordinal</em>.</p>
+<p>Tiene registros nulos los cuales analizaremos posteriormente.</p>
+<div class="cell" data-execution_count="276">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Nivel de desempeño'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 3227 registros nulos y 11 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Nivel de desempeño</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>19690</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>7739</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5593</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4802</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">B2</td>
+<td>3806</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">B1</td>
+<td>2627</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">A2</td>
+<td>746</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">A1</td>
+<td>218</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>27</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>26</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Pre-A1</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="277">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Nivel de desempeño'</span>, <span class="st">'Nivel_Desempeño'</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Nivel de desempeño</code> por <code>Nivel_Desempeño</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="percentil-nacional-módulo-int64" class="level4" data-number="6.2.1.19">
+<h4 data-number="6.2.1.19" class="anchored" data-anchor-id="percentil-nacional-módulo-int64"><span class="header-section-number">6.2.1.19</span> <code>Percentil nacional módulo</code> [Int64]</h4>
+<p>Indica el porcentaje de estudiantes a nivel nacional que presentaron el <strong>Módulo</strong> con puntajes inferiores al obtenido por la persona evaluada</p>
+<div class="cell" data-execution_count="278">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Percentil nacional módulo'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 0 registros nulos y 100 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Percentil nacional módulo</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">100</td>
+<td>2123</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">98</td>
+<td>1652</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">97</td>
+<td>1486</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">96</td>
+<td>1482</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">90</td>
+<td>1471</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>142</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">24</td>
+<td>140</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>134</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>125</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25</td>
+<td>118</td>
+</tr>
+</tbody>
+</table>
+
+<p>100 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="279">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Percentil nacional módulo'</span>,<span class="st">'Perc_Mod'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Percentil nacional módulo</code> por <code>Perc_Mod</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+</section>
+<section id="percentil-grupo-nbc-módulo-int32" class="level4" data-number="6.2.1.20">
+<h4 data-number="6.2.1.20" class="anchored" data-anchor-id="percentil-grupo-nbc-módulo-int32"><span class="header-section-number">6.2.1.20</span> <code>Percentil grupo nbc módulo</code> [Int32]</h4>
+<p>Indica el porcentaje de estudiantes a nivel nacional y del mismo NBC que presentaron el <strong>Módulo</strong> con puntajes inferiores al obtenido por la persona evaluada.</p>
+<div class="cell" data-execution_count="280">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Percentil grupo nbc módulo'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 180 registros nulos y 100 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Percentil grupo nbc módulo</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">100.0</td>
+<td>1885</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">90.0</td>
+<td>1288</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">98.0</td>
+<td>1240</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1.0</td>
+<td>1210</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">97.0</td>
+<td>1181</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16.0</td>
+<td>177</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6.0</td>
+<td>169</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26.0</td>
+<td>166</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9.0</td>
+<td>164</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7.0</td>
+<td>163</td>
+</tr>
+</tbody>
+</table>
+
+<p>100 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="281">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>rename_col(sam,<span class="st">'Percentil grupo nbc módulo'</span>,<span class="st">'Perc_nbc_mod'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Ejecutamos una función personalizada para cambiar el nombre de la columna <code>Percentil grupo nbc módulo</code> por <code>Perc_nbc_mod</code> para evitar posibles errores en los procesos posteriores.
+</p>
+</div>
+</div>
+<p>Este valor está en formato <code>float</code>, vamos a convertilo a <code>Int</code>: como tiene valores nulos, vamos a imputarlos por 0 (verificando que no hayan valores en 0 preexistentes), para posteriormente hacer la conversión a Int. En una etapa posterior se le dará manejo a estos valores en cero (0)</p>
+<div class="cell" data-execution_count="282">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sam[sam[<span class="st">'Perc_nbc_mod'</span>]<span class="op">==</span><span class="dv">0</span>].count().<span class="bu">sum</span>()<span class="op">&gt;</span><span class="dv">0</span>:<span class="co">#Verificar si el Dataset tiene valores 0.</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span> (<span class="st">'El dataset tiene valores iguales a 0, no se recomienda imputar Nulls'</span>)  </span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Si no los tiene, vamos a reemplazar los NUll/NAN por 0 y le daremos manejo posteriormente.</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    sam[<span class="st">'Perc_nbc_mod'</span>] <span class="op">=</span> sam[<span class="st">'Perc_nbc_mod'</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    sam[<span class="st">'Perc_nbc_mod'</span>] <span class="op">=</span> sam[<span class="st">'Perc_nbc_mod'</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Se ha realizado la imputación correctamente'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Se ha realizado la imputación correctamente</code></pre>
+</div>
+</div>
+</section>
+<section id="novedades-obj" class="level4" data-number="6.2.1.21">
+<h4 data-number="6.2.1.21" class="anchored" data-anchor-id="novedades-obj"><span class="header-section-number">6.2.1.21</span> <code>Novedades</code> [obj]</h4>
+<p>Este campo incluye observaciones, reportes o irregularidades que se hayan generado durante la presentación del examen.</p>
+<p>Es de utilidad porque nos ayuda a depurar los registros de pruebas que hayan sido presentadas de forma incompleta o irregular, las cuales eliminaremos de nuestro análisis.</p>
+<div class="cell" data-execution_count="283">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>Nulls_Uniques(sam,<span class="st">'Novedades'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Este campo tiene 47558 registros nulos y 7 valores únicos
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<p style="font-size:18px;">
+Sus valores únicos son:
+</p>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Novedades</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Usted aparece como ausente en las dos sesiones del examen, por esto no tiene resultados.</td>
+<td>770</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Usted no contestó ninguna de las preguntas del examen, por lo tanto no tiene resultados.\r</td>
+<td>78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">La Oficina Asesora Jurídica del ICFES adelanta una actuación administrativa en su contra por supuesta falta o conducta prohibida realizada durante la aplicación del examen. No se registran sus resultados (Resolución 631 de 2015 del ICFES)</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Usted asistió únicamente a la segunda sesión del examen, por esto no tiene resultados.\r\n</td>
+<td>15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Usted asistió únicamente a la primera sesión del examen, por esto no tiene resultados.</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">La validez del resultado está condicionada a la conclusión de la actuación administrativa que adelanta la Oficina Asesora Jurídica del ICFES por la presunta comisión de falta o conducta prohibida, en los términos de la Resolución 631/2015 del ICFES.</td>
+<td>14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Su resultado no se muestra porque no presentó documento de identidad válido durante el examen. Tampoco envió copia de documento con huella para comprobar su identidad. Para obtener mas información comuníquese con la Unidad de Atención al Ciudadano del ICFES.</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="resumen-y-next-steps" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="resumen-y-next-steps"><span class="header-section-number">6.2.2</span> Resumen y Next Steps</h3>
+<ol type="1">
+<li>El campo <code>Periodo</code> es importante pero requiere procesamiento (Procesar)</li>
+<li>el campo <code>Aplicación</code> no aporta info relevante (Eliminar)</li>
+<li>El campo <code>Examen</code> tiene valores de Saber TyT (Procesar y Eliminar)</li>
+<li>El campo <code>Tipo_Documento</code> no aporta información relevante (Eliminar)</li>
+<li>El campo <code>Documento</code> se encuentra repetido por la estructura del dataset. (Procesar)</li>
+<li>El campo <code>Nombre</code> No aporta información relevante para el análisis pero es importante para interpretar lo resultados de los análisis (Separar)</li>
+<li>El campo <code>Numero_Registro</code> No aporta información relevante para el análisis pero es importante para consultas posteriores (Separar)</li>
+<li>El campo <code>Tipo_Evaluado</code> se deben eliminar pruebas presentadas a título <em>Individual</em> (Procesar y Eliminar)</li>
+<li>El campo <code>SNIES_Programa</code> No aporta información relevante para el análisis pero es importante para consultas posteriores (Separar)</li>
+<li>El campo <code>Programa</code> se deben eliminar programas que no pertenecen a Uninorte (Procesar)</li>
+<li>El campo <code>Ciudad</code> No aporta información relevante ya que todos los registros tienen el mismo valor (Eliminar).</li>
+<li>El campo <code>ID_NBC</code> Puede ser una variable influyente (Mantener)</li>
+<li>El campo <code>NBC</code> No aporta información relevante para el análisis pero es importante para interpretar lo resultados de los análisis (Separar)</li>
+<li>El campo <code>PG</code> es una de la viarables objetivo del análisis (Mantener)</li>
+<li>El campo <code>Perc_Global</code> Podría aportar al análisis (Mantener)</li>
+<li>El campo <code>Perc_NBC</code> Podría aportar al análisis (Mantener)<br>
+</li>
+<li>El campo <code>Módulo</code> Separa los resultados de cada prueba individualente (Procesar)</li>
+<li>El campo <code>Nivel_Desempeño</code> es variable objetivo, tiene nulos (Procesar)</li>
+<li>El campo <code>Perc_Mod</code> Podría aportar al análisis (Mantener)<br>
+</li>
+<li>El campo <code>Perc_nbc_mod</code> Podría aportar al análisis (Mantener)<br>
+</li>
+<li>El campo <code>Novedades</code> Importante para la limpieza del dataset pero no para el análisis (Mantener)</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="descripción-de-variables-de-dataset-pob" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Descripción de variables de dataset Pob</h1>
+<div class="cell" data-execution_count="285">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>pob.columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="285">
+<pre><code>Index(['PERIODO', 'ESTU_CONSECUTIVO', 'ESTU_CODDANE_COLE_TERMINO',
+       'ESTU_VALORMATRICULAUNIVERSIDAD', 'ESTU_COMOCAPACITOEXAMENSB11',
+       'ESTU_SEMESTRECURSA', 'FAMI_EDUCACIONPADRE', 'FAMI_EDUCACIONMADRE',
+       'ESTU_HORASSEMANATRABAJA', 'INST_COD_INSTITUCION',
+       'INST_NOMBRE_INSTITUCION', 'ESTU_PRGM_ACADEMICO',
+       'ESTU_SNIES_PRGMACADEMICO', 'GRUPOREFERENCIA', 'ESTU_PRGM_CODMUNICIPIO',
+       'ESTU_PRGM_DEPARTAMENTO', 'ESTU_NUCLEO_PREGRADO',
+       'ESTU_INST_CODMUNICIPIO', 'ESTU_INST_DEPARTAMENTO',
+       'INST_CARACTER_ACADEMICO', 'MOD_RAZONA_CUANTITAT_PUNT',
+       'MOD_RAZONA_CUANTITAT_DESEM', 'MOD_LECTURA_CRITICA_PUNT',
+       'MOD_LECTURA_CRITICA_DESEM', 'MOD_COMPETEN_CIUDADA_PUNT',
+       'MOD_COMPETEN_CIUDADA_DESEM', 'MOD_INGLES_PUNT', 'MOD_INGLES_DESEM',
+       'MOD_COMUNI_ESCRITA_PUNT', 'MOD_COMUNI_ESCRITA_DESEM', 'PUNT_GLOBAL',
+       'filter_$', 'ZPUNT_GLOBAL', 'ZSco01'],
+      dtype='object')</code></pre>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-Icfes2024_II" class="csl-entry" role="listitem">
+Icfes. 2024a. <span>“Entender Resultados Saber PRO.”</span> Infografía en formato PDF. <a href="https://www.icfes.gov.co/web/cajas-herramientas/saberpro">https://www.icfes.gov.co/web/cajas-herramientas/saberpro</a>.
+</div>
+<div id="ref-Icfes2024_glos" class="csl-entry" role="listitem">
+———. 2024b. <span>“Glosario.”</span> <a href="https://www.icfes.gov.co/web/guest/glosario">https://www.icfes.gov.co/web/guest/glosario</a>.
+</div>
+<div id="ref-Icfes2024" class="csl-entry" role="listitem">
+———. 2024c. <span>“Oferta de Módulos Específicos Del Examen Saber Pro.”</span> <a href="https://www.icfes.gov.co/oferta-de-modulos-especificos-examen-saber-pro">https://www.icfes.gov.co/oferta-de-modulos-especificos-examen-saber-pro</a>.
+</div>
+<div id="ref-Icfes2024_modulos" class="csl-entry" role="listitem">
+———. 2024d. <span>“Oferta de Módulos Específicos Del Examen Saber Pro.”</span> <a href="https://www.icfes.gov.co/web/guest/oferta-de-modulos-especificos-examen-saber-pro">https://www.icfes.gov.co/web/guest/oferta-de-modulos-especificos-examen-saber-pro</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./5_methodology.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Metodología CRISP DM</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./5_2_cleaning.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Data Cleaning and Wrangling</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

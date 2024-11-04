@@ -1,0 +1,59 @@
+{
+  "index.qmd": {
+    "index.html": "6308433b"
+  },
+  "intro.qmd": {
+    "intro.html": "f7350f93"
+  },
+  "summary.qmd": {
+    "summary.html": "5bf4252b"
+  },
+  "references.qmd": {
+    "references.html": "61eea443"
+  },
+  "5,1_load_prep.ipynb": {
+    "5,1_load_prep.html": "d3f9b0c9"
+  },
+  "load_data.ipynb": {
+    "load_data.html": "a76c2548"
+  },
+  "0_intro.md": {
+    "0_intro.html": "06fd0557"
+  },
+  "0_intro.qmd": {
+    "0_intro.html": "a2a30650"
+  },
+  "1_problem.md": {
+    "1_problem.html": "6835fad7"
+  },
+  "2_justification.md": {
+    "2_justification.html": "d824c4ba"
+  },
+  "3_objetives.md": {
+    "3_objetives.html": "250f8e9b"
+  },
+  "4_state_art.md": {
+    "4_state_art.html": "d051e98f"
+  },
+  "5_methodology.md": {
+    "5_methodology.html": "99609091"
+  },
+  "5_1_load_data.ipynb": {
+    "5_1_load_data.html": "1dd09f82"
+  },
+  "6_results.md": {
+    "6_results.html": "aa3ddf3f"
+  },
+  "7_schedule.md": {
+    "7_schedule.html": "ada3ffd4"
+  },
+  "8_references.md": {
+    "8_references.html": "eeb2cf20"
+  },
+  "8_references.qmd": {
+    "8_references.html": "2b7b45ba"
+  },
+  "5_2_cleaning.ipynb": {
+    "5_2_cleaning.html": "c7407c21"
+  }
+}
